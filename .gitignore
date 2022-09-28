@@ -1,0 +1,6 @@
+*.swp
+input
+!input/
+!input/test.txt
+!input/.gitkeep
+__pycache__
