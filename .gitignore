@@ -3,5 +3,8 @@ input
 !input/
 !input/test.txt
 !input/test2.txt
+!input/test3.txt
+!input/test-expert.txt
+!input/test-expert2.txt
 !input/.gitkeep
 __pycache__
