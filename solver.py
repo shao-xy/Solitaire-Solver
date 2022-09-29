@@ -12,10 +12,6 @@ def solve_TriPeaks(deck, cards, topo, available_positions, actions, deck_pos, cu
 	if not available_positions:
 		# Solved: no cards left
 		return actions, True
-	if deck_pos > 23:
-		# Unsolved
-		#sys.stderr.write('Unsolved!\n')
-		return None, False
 
 	zipped_available_positions = zip(range(len(available_positions)), available_positions)
 	possible_positions = [ t for t in list(zipped_available_positions) if is_adjacent(cards[t[1]], cur_rank) ]
@@ -29,14 +25,23 @@ def solve_TriPeaks(deck, cards, topo, available_positions, actions, deck_pos, cu
 		topo.unpick(pos)
 
 	# Empty or all failed?
-	return solve_TriPeaks(deck, cards, topo, available_positions, actions + [-1], deck_pos + 1, deck[deck_pos+1])
+	deck_pos += 1
+	if deck_pos > 23:
+		# Unsolved
+		#sys.stderr.write('Unsolved!\n')
+		return None, False
+	return solve_TriPeaks(deck, cards, topo, available_positions, actions + [-1], deck_pos, deck[deck_pos])
 
 def solve(fin, fout):
 	deck, cards = TriPeaksTopo.load_challenge(fin)
 	action_list, ret = solve_TriPeaks(deck, cards, TriPeaksTopo(), list(range(10)), [], 0, deck[0])
 	if ret < 0:	return ret
 	
-	for action in action_list:
-		fout.write('%s\n', str(action))
+	#fout.write(str(action_list) + '\n')
+	for pos in action_list:
+		if pos != -1:
+			fout.write('%s (%s)\n' % (TriPeaksTopo.humanize_str(pos), rank_str_table[cards[pos]]))
+		else:
+			fout.write('Shift card in deck\n')
 	fout.close()
 	return 0

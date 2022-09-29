@@ -2,5 +2,6 @@
 input
 !input/
 !input/test.txt
+!input/test2.txt
 !input/.gitkeep
 __pycache__

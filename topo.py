@@ -9,7 +9,7 @@ class Cell:
 	
 	def available(self):
 		if self.used:	return False
-		for parent in self.parent:
+		for parent in self.parents:
 			if not parent.used:
 				return False
 		return True
@@ -81,13 +81,15 @@ class TriPeaksTopo:
 		Cell.link_child(cells[23], cells[27])
 		Cell.link_child(cells[24], cells[27])
 
+		self.cells = cells
+
 	def pick(self, pos):
 		cell = self.cells[pos]
 		return cell.pick()
 
 	def unpick(self, pos):
 		cell = self.cells[pos]
-		return cells.unpick()
+		return cell.unpick()
 
 	@staticmethod
 	def load_challenge(fin):
@@ -102,10 +104,45 @@ class TriPeaksTopo:
 
 		# Next lines: cards 0-9, 10-18, 19-24, 25-27
 		cards = []
-		for i in range(3):
+		for i in range(4):
 			cards += read_card_list(fin)
 		assert(len(cards) == 28)
 
 		fin.close()
 		
 		return deck, cards
+
+	@staticmethod
+	def humanize_str(pos):
+		pos_table = {
+			0: '1st card in the 1st line',
+			1: '2nd card in the 1st line',
+			2: '3rd card in the 1st line',
+			3: '4th card in the 1st line',
+			4: '5th card in the 1st line',
+			5: '6th card in the 1st line',
+			6: '7th card in the 1st line',
+			7: '8th card in the 1st line',
+			8: '9th card in the 1st line',
+			9: '10th card in the 1st line',
+			10: '1st card in the 2nd line',
+			11: '2nd card in the 2nd line',
+			12: '3rd card in the 2nd line',
+			13: '4th card in the 2nd line',
+			14: '5th card in the 2nd line',
+			15: '6th card in the 2nd line',
+			16: '7th card in the 2nd line',
+			17: '8th card in the 2nd line',
+			18: '9th card in the 2nd line',
+			19: '1st card in the 3rd line',
+			20: '2nd card in the 3rd line',
+			21: '3rd card in the 3rd line',
+			22: '4th card in the 3rd line',
+			23: '5th card in the 3rd line',
+			24: '6th card in the 3rd line',
+			25: '1st card in the 4th line',
+			26: '2nd card in the 4th line',
+			27: '3rd card in the 4th line',
+		}
+    # We don't check KeyError here: it shouldn't happen
+		return pos_table[pos]
