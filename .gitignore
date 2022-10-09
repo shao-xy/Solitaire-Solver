@@ -1,11 +1,5 @@
 *.swp
 input/*
-!input/test.txt
-!input/test2.txt
-!input/test3.txt
-!input/test4.txt
-!input/test5.txt
-!input/test-expert.txt
-!input/test-expert2.txt
-!input/.gitkeep
+!input/Pyramid/
+!input/TriPeaks/
 __pycache__

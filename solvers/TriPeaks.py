@@ -1,33 +1,5 @@
-from common import *
-
-class Cell:
-	def __init__(self, pos):
-		self.pos = pos
-		self.parents = []
-		self.children = []
-		self.used = False
-	
-	def available(self):
-		if self.used:	return False
-		for parent in self.parents:
-			if not parent.used:
-				return False
-		return True
-
-	def pick(self):
-		assert(self.available())
-		self.used = True
-		return [child.pos for child in self.children if child.available()]
-
-	def unpick(self):
-		for child in self.children:
-			assert(not child.used)
-		self.used = False
-
-	@staticmethod
-	def link_child(parent_cell, child_cell):
-		parent_cell.children.append(child_cell)
-		child_cell.parents.append(parent_cell)
+from solvers.topo import Cell
+from solvers.common import *
 
 class TriPeaksTopo:
 	def __init__(self):
@@ -144,5 +116,43 @@ class TriPeaksTopo:
 			26: '2nd card in the 4th line',
 			27: '3rd card in the 4th line',
 		}
-    # We don't check KeyError here: it shouldn't happen
+		# We don't check KeyError here: it shouldn't happen
 		return pos_table[pos]
+
+def solve_TriPeaks_recur(deck, cards, topo, available_positions, actions, deck_pos, cur_rank):
+	if not available_positions:
+		# Solved: no cards left
+		return actions, True
+
+	zipped_available_positions = zip(range(len(available_positions)), available_positions)
+	possible_positions = [ t for t in list(zipped_available_positions) if is_adjacent(cards[t[1]], cur_rank) ]
+
+	for idx, pos in possible_positions:
+		new_available_positions = available_positions.copy() + topo.pick(pos)
+		del new_available_positions[idx]
+		action_list, ret = solve_TriPeaks_recur(deck, cards, topo, new_available_positions, actions + [pos], deck_pos, cards[pos])
+		if ret:
+			return action_list, ret
+		topo.unpick(pos)
+
+	# Empty or all failed?
+	deck_pos += 1
+	if deck_pos > 23:
+		# Unsolved
+		#sys.stderr.write('Unsolved!\n')
+		return None, False
+	return solve_TriPeaks_recur(deck, cards, topo, available_positions, actions + [-1], deck_pos, deck[deck_pos])
+
+def solve_TriPeaks(fin, fout):
+	deck, cards = TriPeaksTopo.load_challenge(fin)
+	action_list, ret = solve_TriPeaks_recur(deck, cards, TriPeaksTopo(), list(range(10)), [], 0, deck[0])
+	if ret < 0:	return ret
+	
+	#fout.write(str(action_list) + '\n')
+	for pos in action_list:
+		if pos != -1:
+			fout.write('%s (%s)\n' % (TriPeaksTopo.humanize_str(pos), rank_str_table[cards[pos]]))
+		else:
+			fout.write('Shift card in deck\n')
+	fout.close()
+	return 0
