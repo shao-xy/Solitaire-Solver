@@ -149,10 +149,16 @@ def solve_TriPeaks(fin, fout):
 	if ret < 0:	return ret
 	
 	#fout.write(str(action_list) + '\n')
+	gathered_shift = 0
+	total_shift = 0
 	for pos in action_list:
 		if pos != -1:
+			if gathered_shift > 0:
+				fout.write('Shift %d card(s) in deck >(%s)\n' % (gathered_shift, rank_str_table[deck[total_shift]]))
+				gathered_shift = 0
 			fout.write('%s (%s)\n' % (TriPeaksTopo.humanize_str(pos), rank_str_table[cards[pos]]))
 		else:
-			fout.write('Shift card in deck\n')
+			gathered_shift += 1
+			total_shift += 1
 	fout.close()
 	return 0
